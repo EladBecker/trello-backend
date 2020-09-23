@@ -62,5 +62,6 @@ module.exports = {
     getBoards,
     getBoard,
     deleteBoard,
-    updateBoard
+    updateBoard,
+    addBoard
 }
