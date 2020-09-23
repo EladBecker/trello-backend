@@ -49,7 +49,8 @@ async function deleteBoard(req, res) {
 async function updateBoard(req, res) {
     try {
         const board = req.body;
-        await boardService.update(board)
+        const updatedBoard = await boardService.update(board)
+        socketService.emitBoardUpdate(updatedBoard)
         res.send(board)
     } catch (err) {
         logger.error('Cannot update board', err);
