@@ -1,14 +1,16 @@
 
 module.exports = {
     connectSockets,
-    emitBoardUpdate
+    emitBoardUpdate,
 };
 
 let ioSocket = null;
+
 function emitBoardUpdate(board) {
     // ioSocket.to(board._id).emit('board-updated', board)
     ioSocket.to(board._id).emit('board-updated', board)
 }
+
 function connectSockets(io) {
     ioSocket = io;
     io.on('connection', socket => {
