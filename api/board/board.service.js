@@ -7,24 +7,35 @@ module.exports = {
     getById,
     remove,
     update,
-    add
+    add,
+    queryWithMember
 }
 
 const boardCollection = 'board'
 
+async function queryWithMember(queryObj) {
+    const collection = await dbService.getCollection(boardCollection)
+    let boards = await collection.find(queryObj).toArray()
+    return boards
+}
+
 async function query(query) {
 
     let filter = {}
+    console.log(query.filter)
     if (query.filter) {
         // if query filter exists - parse it to an object
         query.filter = query.filter.substring(1)
         filter = JSON.parse('{"' + decodeURI(query.filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
+        
         // if it has a bool as a string - turn it into a bool
         for (const key in filter) {
             if (filter[key] === 'true') filter[key] = true
             if (filter[key] === 'false') filter[key] = false
         }
     }
+
+
     // get collection
     const collection = await dbService.getCollection(boardCollection)
 
