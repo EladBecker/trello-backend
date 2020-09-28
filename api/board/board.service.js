@@ -7,18 +7,54 @@ module.exports = {
     getById,
     remove,
     update,
-    add
+    add,
+    queryWithMember
 }
 
 const boardCollection = 'board'
 
-async function query(filterBy = {}) {
+async function queryWithMember(queryObj) {
     const collection = await dbService.getCollection(boardCollection)
+    let boards = await collection.find(queryObj).toArray()
+    return boards
+}
+
+async function query(query) {
+
+    let filter = {}
+    console.log(query.filter)
+    if (query.filter) {
+        // if query filter exists - parse it to an object
+        query.filter = query.filter.substring(1)
+        filter = JSON.parse('{"' + decodeURI(query.filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
+        
+        // if it has a bool as a string - turn it into a bool
+        for (const key in filter) {
+            if (filter[key] === 'true') filter[key] = true
+            if (filter[key] === 'false') filter[key] = false
+        }
+    }
+
+
+    // get collection
+    const collection = await dbService.getCollection(boardCollection)
+
+    // initialize
+    let boards;
+
+    // get collection size
+    const boardSize = await collection.find({isArchived:false}).count()
+    
+    // get the board
     try {
-        const boards = await collection.find(filterBy).toArray();
+        if (query.limit) {
+            boards = await collection.find(filter).limit(query.limit * 1).skip(query.skip * 1).toArray();
+        } else {
+            boards = await collection.find(filter).toArray()
+        }
         // users.forEach(user => delete user.password);
 
-        return boards
+        return { boards, boardSize }
     } catch (err) {
         console.log('ERROR: cannot find boards')
         throw err;

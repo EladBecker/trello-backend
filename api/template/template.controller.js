@@ -26,6 +26,7 @@ async function addTemplate(req, res) {
 }
 
 async function getTemplates(req, res) {
+    
     try {
         const templates = await templateService.query(req.query)
         res.send(templates)

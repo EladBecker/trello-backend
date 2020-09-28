@@ -1,7 +1,9 @@
 
 const dbService = require('../../services/db.service')
+const boardService = require('../board/board.service')
 const reviewService = require('../review/review.service')
 const ObjectId = require('mongodb').ObjectId
+
 
 module.exports = {
     query,
@@ -9,7 +11,86 @@ module.exports = {
     getByEmail,
     remove,
     update,
-    add
+    add,
+    getUserDetails
+}
+
+async function getUserDetails(userId) {
+    // compiling user report
+    const boards = await boardService.queryWithMember({ 'members._id': userId })
+    console.log('board length',boards.length)
+    const userData = []
+    const userActivities = []
+    boards.forEach(board => {
+        // create a minified data for any board the user is a member of
+        const minifiedData = {
+            board: {
+                id: board._id,
+                title: board.title,
+                isArchived: board.isArchived,
+                style: board.style
+            },
+            cards: [],
+            groups: []
+        }
+        board.groups.forEach(group => {
+            group.cards.forEach(card => {
+                if (card.members) card.members.forEach(member => {
+                    if (member._id === userId) {
+                        // add the group and card details
+                        minifiedData.groups.push({
+                            title: group.title,
+                            id: group.id,
+                            archivedAt: group.archivedAt
+                        })
+
+                        minifiedData.cards.push({
+                            title: card.title,
+                            createdAt: card.createdAt,
+                            description: card.description,
+                            dueDate: card.dueDate,
+                            id: card.id
+                        })
+                    }
+                })
+            })
+        })
+
+        if (board.activities.length) {
+            board.activities.forEach(activity => {
+                if (activity.byMember._id === userId) {
+                    const activityData = {
+                        board: {
+                            id: board._id,
+                            title: board.title,
+                            isArchived: board.isArchived
+                        },
+                        activity: {
+                            boardId: board._id,
+                            createdAt: activity.createdAt,
+                            txt: activity.txt,
+                            commentTxt: activity.commentTxt,
+                            id: activity.id,
+                            byMember: {
+                                id: userId,
+                                fullName: activity.byMember.fullName,
+                                imgUrl: activity.byMember.imgUrl
+                            },
+                            card: {
+                                id: activity.card.id,
+                                title: activity.card.title
+                            }
+                        }
+                    }
+                    userActivities.push(activityData)
+                }
+            })
+            
+        }
+        // add it to the array
+        userData.push(minifiedData)
+    });
+    return {userData,userActivities}
 }
 
 async function query(filterBy = {}) {

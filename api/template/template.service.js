@@ -14,14 +14,50 @@ module.exports = {
 }
 
 const templateCollection = 'templates'
+// if (!query) query.filterBy = {}
 
-async function query(filterBy = {}) {
+// const collection = await dbService.getCollection(boardCollection)
+// let boards;
+// try {
+//     if (query.limit) {
+//         boards = await collection.find(query.filterBy).limit(2).skip(0).toArray();
+//     } else {
+//         boards = await collection.find(query).toArray()
+//     }
+//     // users.forEach(user => delete user.password);
+
+//     return boards
+// } catch (err) {
+//     console.log('ERROR: cannot find boards')
+//     throw err;
+// }
+
+async function query(query) {
+    
+    let filter = {}
+    if (query.filter) {
+        // if query filter exists - parse it to an object
+        query.filter = query.filter.substring(1)
+        filter = JSON.parse('{"' + decodeURI(query.filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
+        // if it has a bool as a string - turn it into a bool
+        for (const key in filter) {
+            if (filter[key] === 'true') filter[key] = true
+            if (filter[key] === 'false') filter[key] = false
+        }
+    }
+
     const collection = await dbService.getCollection(templateCollection)
+    let templates;
+    const    templateSize = await collection.find(filter).count()
     try {
-        const templates = await collection.find(filterBy).toArray();
-        // users.forEach(user => delete user.password);
-
-        return templates
+        if (query.limit) {
+            templates = await collection.find(filter).limit(query.limit*1).skip(query.skip*1).toArray()
+        } else { 
+             templates = await collection.find(filter).toArray();
+        }
+        
+        
+        return {templates,templateSize}
     } catch (err) {
         console.log('ERROR: cannot find template')
         throw err;
