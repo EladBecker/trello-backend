@@ -6,6 +6,12 @@ async function getUser(req, res) {
     res.send(user)
 }
   
+async function getUserDetails(req,res) {
+    
+    const userDetails = await userService.getUserDetails(req.params.id)
+    res.send(userDetails)
+}
+
 async function getUsers(req, res) {
     const users = await userService.query(req.query)
     res.send(users)
@@ -26,5 +32,6 @@ module.exports = {
     getUser,
     getUsers,
     deleteUser,
-    updateUser
+    updateUser,
+    getUserDetails
 }
