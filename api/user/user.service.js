@@ -108,6 +108,9 @@ async function query(filterBy = {}) {
 }
 
 async function getById(userId) {
+
+    console.log(log('HERE YOYO!', userId))
+
     const collection = await dbService.getCollection('user')
     try {
         const user = await collection.findOne({ "_id": ObjectId(userId) })
@@ -126,10 +129,10 @@ async function getById(userId) {
         throw err;
     }
 }
-async function getByEmail(email) {
+async function getByEmail(userName) {
     const collection = await dbService.getCollection('user')
     try {
-        const user = await collection.findOne({ email })
+        const user = await collection.findOne({ userName })
         return user
     } catch (err) {
         console.log(`ERROR: while finding user ${email}`)

@@ -28,6 +28,16 @@ async function updateUser(req, res) {
     res.send(user)
 }
 
+//
+
+async function login(req, res){
+    console.log(req);
+    
+}
+
+
+//
+
 module.exports = {
     getUser,
     getUsers,
