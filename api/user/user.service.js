@@ -109,7 +109,7 @@ async function query(filterBy = {}) {
 
 async function getById(userId) {
 
-    console.log(log('HERE YOYO!', userId))
+    console.log('HERE YOYO!', userId)
 
     const collection = await dbService.getCollection('user')
     try {
