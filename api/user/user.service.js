@@ -18,7 +18,7 @@ module.exports = {
 async function getUserDetails(userId) {
     // compiling user report
     const boards = await boardService.queryWithMember({ 'members._id': userId })
-    console.log('board length',boards.length)
+    
     const userData = []
     const userActivities = []
     boards.forEach(board => {
