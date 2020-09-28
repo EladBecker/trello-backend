@@ -5,7 +5,7 @@ async function getUser(req, res) {
     const user = await userService.getById(req.params.id)
     res.send(user)
 }
-  
+
 async function getUsers(req, res) {
     const users = await userService.query(req.query)
     res.send(users)
@@ -22,9 +22,20 @@ async function updateUser(req, res) {
     res.send(user)
 }
 
+//
+
+async function login(req, res){
+    console.log(req);
+    
+}
+
+
+//
+
 module.exports = {
     getUser,
     getUsers,
     deleteUser,
-    updateUser
+    updateUser,
+    login
 }
