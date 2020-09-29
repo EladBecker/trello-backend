@@ -21,12 +21,11 @@ async function login(email, password) {
 
 
 
-async function signup(email, password, username) {
-    logger.debug(`auth.service - signup with email: ${email}, username: ${username}`)
-    if (!email || !password || !username) return Promise.reject('email, username and password are required!')
-
+async function signup(userName, password, fullName, imgUrl) {
+    logger.debug(`auth.service - signup with userName: ${userName}, name: ${fullName}`)
+    if (!userName || !password || !fullName) return Promise.reject('userName, name and password are required!')
     const hash = await bcrypt.hash(password, saltRounds)
-    return userService.add({email, password: hash, username})
+    return userService.add({userName, password: hash, fullName, imgUrl})
 }
 
 module.exports = {
